@@ -1,0 +1,17 @@
+#ifndef VG_H
+#define VG_H
+/*
+Video Games header file
+ */
+#include <iostream>
+#include "parent.h"
+using namespace std;
+
+class vg : public parent{
+ public:
+  vg();
+  virtual ~vg(){
+    cout << "Deleted. "<< endl;
+  }
+  
+};

@@ -1,0 +1,32 @@
+#ifndef MOVIES_H
+#define MOVIES_H
+
+#include <iostream>
+#include "parent.h"
+using namespace std;
+
+class movies : public parent {
+ public:
+  movies();
+  virtual ~movies(){
+    cout << "Deleted." << endl;
+  }
+  virtual void print(vector<parent*>&list, int i){
+    cout << "Title: " << ((parent*)list[i])->getTitle() << endl;
+    cout << "Duration: " << ((movies*)list[i])->getDuration() << endl;
+    cout << "Director: " << ((parent*)list[i])->getAuthor() << endl;
+    cout << "Year: " << ((parent*)list[i])->getYear() << endl;
+    cout << "Rating: " << ((movies*)list[i])->getRating()<<"/10" << endl;
+  }
+						
+  //void setDirector();
+  //char* getDirector();
+  void setDuration();
+  void setRating();
+  float getRating();
+  int getDuration();
+ protected:
+  int duration;
+  float rating;
+};
+#endif

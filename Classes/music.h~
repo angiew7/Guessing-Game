@@ -1,0 +1,25 @@
+#ifndef MUSIC_H
+#define MUSIC_H
+
+#include <iostream>
+#include "parent.h"
+using namespace std;
+
+class music : public parent{
+ public:
+  music();
+  virtual ~music(){
+    cout << "Deleted.";
+  }
+  float getDuration();
+  void setDuration();
+
+  char* getArtist();
+  void setArtist();
+  
+ protected:
+  char artist[100];
+  float duration;
+};
+
+#endif

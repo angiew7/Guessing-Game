@@ -1,0 +1,154 @@
+#include <iostream>
+#include <vector>
+#include <cstring>
+#include "parent.h"
+#include "movies.h"
+
+using namespace std;
+
+void Add(vector<parent*>&list);
+void Search(vector<parent*>&list);
+void Delete(vector<parent*>&list);
+
+int main(){
+  //movies *m;
+  vector<parent*>list;
+  bool running = true;
+  char input[7];
+  while(running == true){
+    cout << "Enter a command: ADD, SEARCH, DELETE, or QUIT" << endl;
+    cin >> input;
+    cin.ignore();
+    //Add a media
+    if(strcmp(input, "ADD")==0){
+      //    cout << "Input type of media: movies, video games, or music (in lowercase)"<< endl;
+      //char type[10];
+      //cin.getline(type, 10, '\n');
+      /*if(strcmp(type, "movies"){
+	movies* m = new movies();
+	Add(&list, m);
+	}
+      */
+      Add(list);
+    }
+    //Search
+    else if(strcmp(input, "SEARCH")== 0){
+      Search(list);
+    }
+    //Delete
+    else if (strcmp(input, "DELETE") == 0){
+      Delete(list);
+    }
+    else if(strcmp(input, "QUIT") == 0){
+      running = false;
+    }
+    
+  }
+  
+  
+  return 0;
+}
+  void Add(vector<parent*>&list){
+    parent* p;
+    cout<< "Movies, Video-games, or Music? " <<endl;
+    char type[15];
+    cin.getline(type, 15, '\n');
+    //cin.ignore();
+    //movies
+    if(strcmp(type, "Movies") == 0){
+      movies *m = new movies();
+      p = m;
+      cout << "Enter Duration (min): " << endl;
+      ((movies*)p)->setDuration();
+  
+      cout << "Enter Title: "<< endl;  
+      ((parent*)p)->setTitle();
+    
+      cout << "Enter Director: " << endl;
+      ((parent*)p)->setAuthor();
+
+      cout << "Enter Year: " << endl;
+      ((parent*)p)->setYear();
+      
+      cout << "Enter Rating (?/10): " << endl;
+      ((movies*)p)->setRating();
+    
+  
+      list.push_back(p);
+    }
+  //get Author
+  
+  
+}
+
+void Search(vector<parent*>&list){
+  char searchBy[6];
+  cout << "Search by title or year? " << endl;
+  cin >> searchBy;
+  cin.ignore();
+  if(strcmp(searchBy, "year") == 0){
+    int newYear = 0;
+    cout << "Enter year: " << endl;
+    cin >> newYear;
+    //cin.ignore();
+    for(int i = 0; i < list.size(); i++){
+      if(((parent*)list[i])->getYear() == newYear){
+	//((parent*)list[i])->print(list, i);
+	list[i]->print(list, i);
+      }
+    }
+  }
+  //Search by Title
+  if(strcmp(searchBy, "title") == 0){
+    char newTitle[100];
+    cout << "Enter title: " << endl;
+    cin.getline(newTitle, 100, '\n');
+    for(int i = 0; i < list.size(); i++){
+      if(strcmp(((parent*)list[i])->getTitle(), newTitle)==0){
+	list[i]->print(list, i);
+      }
+    }
+  }
+  
+}
+void Delete(vector<parent*>&list){
+  char searchBy[6];
+  cout << "Search by title or year?" << endl;
+  cin >> searchBy;
+  cin.ignore();
+  
+  // Search by year
+  if(strcmp(searchBy, "year")==0){
+    int newYear = 0;
+    cout << "Enter year: " << endl;
+    cin >> newYear;
+    // cin.ignore();
+    for(int i = 0; i < list.size(); i++){
+      if(((parent*)list[i])->getYear() == newYear){
+	cout << "Are you sure you want to delete " << ((parent*)list[i])->getTitle() << "? (y/n)" << endl;
+	char yn;
+	cin >> yn;
+	//delete if they agree
+	if(yn == 'y'){
+	  delete list[i];
+	}
+      }
+    }
+  }
+  // Search by title
+  if(strcmp(searchBy, "title")==0){
+    char newTitle[100];
+    cout << "Enter title: " << endl;
+    cin.getline(newTitle, 100, '\n');
+    for(int i = 0; i < list.size(); i++){
+      if(strcmp(((parent*)list[i])->getTitle(), newTitle)==0){
+	cout << "Are you sure you want to delete" << ((parent*)list[i])->getTitle() << "? (y/n)" << endl;
+	char yn;
+	cin >> yn;
+	if(yn=='y'){
+	  delete list[i];
+	}
+      }
+    }
+  }
+}

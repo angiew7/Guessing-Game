@@ -1,0 +1,57 @@
+#include <iostream>
+#include <vector>
+#include <cstring>
+#include "parent.h"
+
+using namespace std;
+
+/*virtual void parent::print(vector<parent*>&list, int i){
+  cout << "Title: " << list[i]->getTitle() << endl;
+}
+*/
+parent::parent(){
+  
+}
+void parent::setYear(){
+  int y =0;
+  cin >> y;
+  year = y;
+}
+int parent::getYear(){
+  return year;
+}
+void parent::setTitle(){
+  char t[50];
+  //cin >> t;
+  cin.get(t, 50, '\n');
+  cin.ignore(50, '\n');
+  strcpy(title, t);
+  //cout << title << endl;
+}
+/*parent::parent(char* newTitle){
+  title = new char[50];
+  strcpy(title, newTitle);
+}
+*/
+char* parent::getTitle(){
+  char* t = (char*)malloc(50*sizeof(char));
+  strcpy(t, title);
+  return title;
+}
+
+//void parent::setYear(){
+  
+//}
+void parent::setAuthor(){
+  char a[50];
+  cin.get(a, 50, '\n');
+  cin.ignore();
+  strcpy(author, a);
+}
+//Publisher or director
+char* parent::getAuthor(){
+  char *a = (char*)malloc(50*sizeof(char));
+  strcpy(a, author);
+  return author;
+}
+
