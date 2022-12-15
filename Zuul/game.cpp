@@ -133,11 +133,9 @@ int main(){
     }
     
    
-    else{
-      moves++;
-    running = checkWin(currentRoom, roof, inventory, moves);
-    }
     moves++;
+    running = checkWin(currentRoom, roof, inventory, moves);
+   
     cout << endl;
   }
   return 0;
