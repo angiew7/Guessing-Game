@@ -44,7 +44,8 @@ void room::setItem(item* newItem){
 }
 void room::printItems(){
   for(int i = 0; i < items.size(); i++){
-    cout << items[i]->getItem();
+	cout << items[i]->getItem();
+	cout << " ";
   }
   cout << endl;
 }
