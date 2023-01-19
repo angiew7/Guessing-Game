@@ -1,0 +1,22 @@
+#include <iostream>
+#include "node.h"
+#include <cstring>
+using namespace std;
+void ADD();
+node* head = NULL;
+int main(){
+  
+  char input[10];
+  cin >> input;
+  if(strcmp(input, "ADD")==0){
+    
+  }
+  return 0;
+}
+void ADD(){
+  Student* student = new Student();
+  if(head->getNext()==NULL){
+
+    
+  }
+}
