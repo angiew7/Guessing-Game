@@ -11,7 +11,16 @@ class Student{
   Student();
   void setID(int newID);
   int getID();
+  void setFirstName();
+  char* getFirstName();
+  void setLastName();
+  char* getLastName();
+  void setGPA();
+  float getGPA();
 private:
+  float gpa;
+  char firstName[50];
+  char lastName[50];
   int ID = 0;
 };
 

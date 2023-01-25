@@ -1,5 +1,9 @@
+/*
+Student class, all the information for the students go here.
+ */
 #ifndef STUDENT_H
 #define STUDENT_H
+
 #include <iostream>
 using namespace std;
 class Student{
@@ -7,7 +11,10 @@ class Student{
   Student();
   void setID(int newID);
   int getID();
- private:
+private:
+  float gpa;
+  char firstName[50];
+  char lastName[50];
   int ID = 0;
 };
 

@@ -1,22 +1,181 @@
 #include <iostream>
 #include "node.h"
+#include "Student.h"
 #include <cstring>
+#include <iomanip>
 using namespace std;
-void ADD();
-node* head = NULL;
+void Add(Node* current, Student* student);
+void Print(Node* next);
+void Average(Node* next, float sum, int num);
+Node* head = NULL;
+
 int main(){
-  
-  char input[10];
-  cin >> input;
-  if(strcmp(input, "ADD")==0){
-    
+  int id =0;
+  bool running = true;
+  while(running ==true){
+    cout << "Enter Command [ADD, PRINT, QUIT]: ";
+    char input[10];
+    cin >> input;
+    cin.ignore();
+    if(strcmp(input, "ADD")==0){
+      //input info
+      int id = 0;
+      Student* student = new Student();
+      
+      cout << "ID: ";
+      cin >> id;
+      cin.ignore();
+      cout << "First Name: ";
+      student->setFirstName();
+      
+      cout << "Last Name: ";
+      student->setLastName();
+      
+      cout << "GPA: ";
+      student->setGPA();
+      
+      student->setID(id);
+      
+      //Node* n = new Node(student);
+      
+      Add(head, student);
+    }
+    if(strcmp(input, "PRINT")==0){
+      Print(head);
+    }
+    if(strcmp(input, "QUIT")==0){
+      running = false;
+    }
+    if(strcmp(input, "AVERAGE")==0){
+      float sum = 0;
+      int num = 0;
+      Average(head, sum, num);
+    }
   }
   return 0;
 }
-void ADD(){
-  Student* student = new Student();
-  if(head->getNext()==NULL){
+void Add(Node* current, Student* student){
+  //int id = 0;
+  int position = 0;
+  //cin >> id;
+  
+  //Student* student = new Student();
+  //student->setID(id);
+  
+  //Node* current = head;
+  //Node* temp = head;
 
+  int dest = 0;
+  //new head
+  if(current==NULL){
+    head = new Node(student);
     
+  }
+  //if new node id is less than head
+  else if(head->getStudent()->getID() > student->getID()){
+        position = 0;
+        cout << "h" << endl;
+        Node* n = new Node(student);
+        n->setNext(head);
+        head = n;
+	//    h = true;
+        cout << "head: " << head->getStudent()->getID() << endl;
+      }
+
+  else{
+    /*  //while(current->getNext()!=NULL){
+    //find position where the new id is the larger
+      if(current->getNext()!= NULL){
+
+	//current = current->getNext();
+	
+	position++;
+	//Store the position
+	if(current->getStudent()->getID() < id){
+          dest = position;
+        }
+	ADD(current->getNext());
+	cout << "a";
+      }
+      
+    int count =0;
+    cout <<"position: "<< dest<< endl;
+    //for (int i = 0; i<position; i++ );
+      
+    if(position != 0){
+      if(count < dest){
+	temp = temp->getNext();
+	count++;
+      }
+    }
+    //add node
+    */
+    /*if(current->getNext()!=NULL){
+      node* next = current->getNext();
+    }
+    else{
+      node* next = 
+    }
+    */
+    if(current->getNext()!= NULL && student->getID() > current->getNext()->getStudent()->getID()){
+      //cout << current->getNext()->getStudent()->getID() << ", ";
+	//if(student->getID()>current->getStudent()->getID()){
+	Add(current->getNext(), student);
+    }
+    //else if(student->getID()>current)
+  
+    
+    else{
+      // cout << (current->getStudent())->getID()<<endl;
+
+      Node* next = current->getNext();
+
+
+
+
+      Node* n = new Node(student);
+      current->setNext(n);
+      n->setNext(next);
+    
+    }
+  }
+}
+void Print(Node* next){
+  if(next==head){
+    cout << "Student list:" << endl;
+  }
+  if(next!= NULL){
+    cout << "Name: " << (next->getStudent())->getFirstName();
+    cout << " " << (next->getStudent())->getLastName();
+    cout << " ID:  "<<(next->getStudent())->getID();
+    cout << " GPA: " <<(next->getStudent())->getGPA() << endl;
+    Print(next->getNext());
+  }
+}
+void Delete(Node* next, int id){
+  if(next()->getNext()!=NULL && next->getNext()->getID()!=id){
+    Delete(next->getNext(), id);
+  }
+  else if(next->getID==id){
+    node* temp = next->getNext();
+    next->setNext((next->getNext())->getNext());
+    free(next);
+  }
+  else{
+    cout << "No ID found. " << endl;
+  }
+}
+void Average(Node* next, float sum, int num){
+  if(next->getNext()!=NULL){
+    sum = sum + (next->getStudent())->getGPA();
+    num++;
+    Average(next->getNext(), sum, num);
+  }
+  else if(next->getNext()==NULL){
+    sum = sum + (next->getStudent())->getGPA();
+    num++;
+    sum = sum/num;
+    cout << setprecision(2) << fixed;
+    cout << "GPA Average: " << sum << endl;
   }
 }
