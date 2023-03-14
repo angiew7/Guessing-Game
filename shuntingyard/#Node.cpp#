@@ -1,0 +1,31 @@
+#include <iostream>
+#include <cstring>
+#include "Node.h"
+
+using namespace std;
+
+Node::Node(char newValue) {
+  value = newValue;
+  right = NULL;
+  left = NULL;
+}
+Node::~Node(){
+  right = NULL;
+  left = NULL;
+}
+char Node::getValue() {
+  return value;  
+}
+Node* getRight(){
+  return right;
+}
+void setRight(Node* Right){
+  right = Right;
+}
+Node* getLeft(){
+  return left;
+}
+void setLeft(Node* Left){
+  left = Left;
+}
+

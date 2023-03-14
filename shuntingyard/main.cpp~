@@ -1,0 +1,189 @@
+#include <iostream>
+#include "Node.h"
+#include <cstring>
+#include<stdio.h>
+#include<ctype.h>
+
+using namespace std;
+void Enqueue(Node* current, char value);
+void Push(Node* current, Node* add);
+Node* Peek(Node* current);
+void Pop(Node* current);
+void Dequeue(Node* current);
+void buildTree(Node* current);
+void Print(Node* current, int depth);
+Node* queueHead  = NULL;
+Node* stackHead = NULL;
+int main(){
+  char input[20];
+  char character;
+  //Node** queue = new Node*[20];
+  //Node** stack = new Node*[20];
+  
+  cout << "Enter expression (single digits, seperated by space): " << endl;
+  cin.get(input, 20, '\n');
+  cin.ignore();
+  for(int i = 0; i < strlen(input); i++){
+    //turn each char seperated by space into node
+    if(!isspace(input[i])){
+      
+      //numbers go straight to queue
+      if(isdigit(input[i])){
+	Enqueue(queueHead, input[i]);
+      }
+      
+      //top of stack goes to queue if right parentheses
+      else if(input[i] == ')'){
+	//move all the values in the parentheses to the stack and delete them
+	// from the stack
+	while(Peek(stackHead)->getValue()!='('){
+	  Enqueue(queueHead, Peek(stackHead)->getValue());
+	  Pop(stackHead);
+	  cout << Peek(stackHead)->getValue() << endl;
+	}
+	//make sure to delete right parentheses
+	if(Peek(stackHead)->getValue()=='('){
+	  Pop(stackHead);
+	}
+      }
+      
+      else if(!isdigit(input[i]) && input[i]!= ')'){
+	Node* n = new Node(input[i]);
+	Push(stackHead, n);
+	
+      }
+    }
+    
+  }
+  //after 'cars' have been moved
+  // keep moving stack to queue
+  while(stackHead!=NULL){
+    Enqueue(queueHead, Peek(stackHead)->getValue());
+    Pop(stackHead);
+  }
+  cout << endl;
+  cout <<  Peek(queueHead)->getValue() << endl;
+  cout << endl;
+  //build tree
+  while(queueHead!=NULL){
+    cout << queueHead->getValue() << endl; 
+    buildTree(queueHead);
+    //if(queueHead!=NULL)
+      Dequeue(queueHead);
+    //cout << "q head " << queueHead->getValue() << endl;
+  }
+  Print(stackHead, 0);
+  return 0;
+}
+
+//Add nodes to queue
+void Enqueue(Node* current, char value){
+  int i = 0;
+  if(current == NULL){
+    queueHead = new Node(value);
+  }
+  else if (current!=NULL){
+    while(current->getNext()!=NULL){
+      current  = current->getNext();
+    }
+    Node* n = new Node(value);
+    current->setNext(n);
+    cout << "queue " << n->getValue() << endl;
+
+  }
+  //cout << "queue " << current->getValue() << endl;
+}
+
+//push node to top of stack
+void Push(Node* current, Node* add){
+  //add->setNext(NULL);
+  if(current == NULL){
+    stackHead = add;
+  }
+  
+  else if (current!=NULL){
+    while(current->getNext()!=NULL){
+      current = current->getNext();
+    }
+    //Node* n = new Node(value);
+    current->setNext(add);
+    cout << "stack" << stackHead->getNext()->getValue() << endl;
+  }
+ 
+
+  
+}
+
+//return top of stack
+Node* Peek(Node* current){
+  while(current->getNext()!=NULL){
+    current = current->getNext();
+  }
+  return current;
+}
+
+//remove top of stack
+void Pop(Node* current){
+  if(current->getNext()==NULL){
+    stackHead = NULL;
+    delete current; 
+  }
+  else{
+    while(current->getNext()->getNext()!=NULL){
+      current = current->getNext();
+    }
+    cout << "deleted " << current->getNext()->getValue() << endl;
+    delete current->getNext();
+    current->setNext(NULL);
+  }
+  }
+
+//delete head of queue
+void Dequeue(Node* current){
+  if(current->getNext()==NULL){
+    queueHead = NULL;
+    delete current;
+  }
+  else if(current->getNext()!=NULL){  
+    Node* temp = current->getNext();
+    queueHead = NULL;
+    delete current;
+    queueHead = temp;
+  }
+}
+
+//make array, set left and right ptrs if non-digit 
+void buildTree(Node* current){
+  //all the numbers get added to stack
+  if(isdigit(current->getValue())){
+    Node* n = new Node(current->getValue());
+    Push(stackHead, n);
+  }
+  else if(!isdigit(current->getValue())){
+      //set left and right as top nodes in stack
+    Node* n =  new Node(current->getValue());
+    Node* newRight = new Node(Peek(stackHead)->getValue());
+    newRight->setRight(Peek(stackHead)->getRight());
+    n->setRight(newRight);
+    Pop(stackHead);
+    Node* newLeft = new Node(Peek(stackHead)->getValue());
+    //FINSIH ADD LEFT N RIGHT
+    newLeft->setLeft(Peek(stackHead)->getValue());
+    n->setLeft(newLeft);
+    Pop(stackHead);
+    Push(stackHead, n);
+  }
+}
+void Print(Node* current, int depth){
+  if(current->getRight()!=NULL){
+    Print(current->getRight(), depth+1);
+  }
+  for(int a  = 0; a < depth; a++){
+    cout<<'\t';
+  }
+  cout<<current->getValue() << endl;
+  if(current->getLeft()!=NULL){
+    Print(current->getLeft(), depth+1);
+  }
+  
+}

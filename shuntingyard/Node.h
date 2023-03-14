@@ -1,0 +1,26 @@
+#ifndef NODE_H
+#define NODE_H
+#include <iostream>
+#include <cstring>
+
+using namespace std;
+
+class Node { // Node Class
+public:
+  Node();
+  Node(char newValue); // Node Constructor
+  ~Node(); // Destructor
+  char getValue(); // get student*
+  void setRight(Node* Right); // Set the right node
+  Node* getRight(); // Get the right node
+  void setLeft(Node* Left); // Set the left node
+  Node* getLeft(); // Get the left node
+  void setNext(Node* Next);
+  Node* getNext();
+private:
+  Node* right;
+  Node* left;
+  char value;
+  Node* next;
+};
+#endif
