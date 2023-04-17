@@ -14,13 +14,10 @@ Node::Node(int newValue) {
 Node::~Node(){
   left = NULL;
   right = NULL;
-  delete value;
+
 }
 int Node::getValue() {
   return value;  
-}
-void Node::setValue(int num){
-  value = num;
 }
 Node* Node::getRight(){
   return right;

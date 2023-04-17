@@ -21,7 +21,7 @@ public:
 private:
   Node* right;
   Node* left;
-  char value;
+  int value;
 
 };
 #endif

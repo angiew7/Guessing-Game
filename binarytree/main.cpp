@@ -1,17 +1,6 @@
-/*
-  Angie Wang
-  4/7/2023
-  Binary Search Tree -creates a binary tree where the right value is greater than the head and the left is less than or equal to the head
-  
-  Add: Manually adds or Generates from file
-  Search: user enters in a number, outputs if its found in the tree or not
-  Delete: deletes the inputted node, replacing the node if needed
-  Print: print the tree
-  Quit: stop program
- */
 #include <iostream>
 #include <cstring>
-#include <time.h>
+//#include <time.h>
 #include "Node.h"
 #include <fstream>
 #include<stdio.h>
@@ -19,12 +8,12 @@
 
 using namespace std;
 Node* head = NULL;
-Node* Add(Node* current, int num);
+void Add(Node* current, int num);
 void Print(Node* current, int depth);
 void Search(Node* current, int num);
 void Delete(Node* current, Node* prev, int num);
 int main(){
-  srand(time(NULL));
+  //  srand(time(NULL));
   char input[20];
   bool playing = true;
   while(playing == true){
@@ -37,40 +26,71 @@ int main(){
       cin >> input;
       cin.ignore();
       if(strcmp("MANUAL",input)==0){
-	int num = 0;
-	cin >> num;
-	cin.ignore();
-	if(head==NULL)
-	  head = new Node(num);
-	else{
-	  Add(head, num);
-	}
-	cout <<head->getValue()<<endl;
+	cout << "Enter a list of numbers seperated by space: " << endl; 
+	char entry[100];
+	  cin.get(entry,100,'\n');
+
+	  cin.ignore();
+	  char num;
+	  char nums[4];
+	  int count = 0;
+
+	  for(int i = 0; i < strlen(entry); i++){
+	    if(!isspace(entry[i])){
+	      
+	      nums[count] = entry[i];
+	      count++;
+
+	    }
+	    if (isspace(entry[i])||i+1==strlen(entry)){
+	      count = 0;
+	      int num = stoi(nums);
+	      cout << "final "<<num << endl;
+
+	      nums[0]='\0';
+	      nums[1]='\0';
+	      nums[3]='\0';
+	      if(head==NULL){
+	       head = new Node(num);
+
+	      }
+	       else{
+		 Add(head, num);
+	     }
+
+	    }
+	   
+
+	  }
+	
+
       }
       if(strcmp(input, "GENERATE")==0){
 	  cout << "How many numbers do you want to generate? ";
 	  int n = 0;
 	  cin >> n;
 	  cin.ignore();
-          for(int i = 0; i < n; i++){
+
 	  ifstream file("numbers.txt");
 	    int count = 0;
-	    int random = rand()%100;
+
 	    int num = 0;
 	    char* word = new char();
-	    while(file>>word && count != random){
+	    while(file>>word&&count!=n){
 	      num = stoi(word);
 	      count++;
-	    }
-	    //	    cout << word <<"num "<< num << endl;
+	    
+
 	    if(head==NULL)
 	      head = new Node(num);
-	    else
+	    else{
 	      Add(head, num);
+	    }
+	    }
 	    file.close();
       }
-	}
     }
+    
     if(strcmp("PRINT",input)==0){
       Print(head, 0);
     }
@@ -94,26 +114,30 @@ int main(){
 
     }
 }
-Node* Add(Node* current, int num){
-    //no head
-  
-  if(current == NULL){
-  
-    return new Node(num);
-   
+void Add(Node* current, int num){
+  Node* parent = NULL;
+  Node* newNode = new Node(num);
+  //Node* current = head;
+  while(current!=NULL){
+    parent=current;
+    if(num < current->getValue()){
+      current  = current->getLeft();
+    }
+    else if(num >=  parent->getValue()){
+      current = current->getRight();
+    }
   }
   
-   
-  //transversal
-    if(num <= current->getValue()){
-      current->setLeft(Add(current->getLeft(), num));
-    }
-    else if(num > current->getValue()){
-      current->setRight(Add(current->getRight(), num));
-    }
   
-      return current;
-  
+  if(num< parent->getValue()){
+    parent->setLeft(newNode);
+  }
+  else if(num>= parent->getValue()){
+    parent->setRight(newNode);
+  }
+
+
+
 }
 void Print(Node* current, int depth){
   //right 
@@ -147,32 +171,27 @@ void Search(Node* current, int num){
   
 }
 void Delete(Node* current, Node* prev, int num){
-  //if greater than, go right, if less, go left
   if(num > current->getValue())
     Delete(current->getRight(), current, num);
   else if(num < current->getValue())
     Delete(current->getLeft(), current, num);
-  
+
+  //if found
   else if(num == current->getValue()){
-    cout << current->getValue()<<endl;
+    
     //if no childrent just delete
     if(current->getLeft()==NULL && current->getRight()==NULL){
-       
-      if(current==prev->getLeft()){
+      
+      if(prev->getLeft()==current)
 	prev->setLeft(NULL);
-      }
-      else if(current==prev->getRight()){
-	prev->setRight(NULL);
-      }
-       
+      if(prev->getRight()==current)
+        prev->setRight(NULL);
 
+      current = NULL;
       delete current;
-      current=NULL;
+      
+       
     }
-
-
-
-    
     //if there is children
     else if(current->getLeft()==NULL||current->getRight()==NULL){
 
@@ -183,30 +202,31 @@ void Delete(Node* current, Node* prev, int num){
       else if(current->getRight()==NULL){
 	temp = current->getLeft();
       }
-    
-      if(current==prev->getLeft()){
+      
+      if(current == head){
+	head = temp;
+      }
+      else if(current==prev->getLeft()){
 	prev->setLeft(temp);
       }
       else if(current==prev->getRight()){
 	prev->setRight(temp);
       }
+      current = NULL;
       delete current;
     }
-
-
-    
     //2 children
     else if (current->getRight()!=NULL&&current->getLeft()!=NULL){
-      //find leftmost node of the right subtree
+      //find leftmost node
       Node* min = current->getRight();
       while(min && min->getLeft()!=NULL){
 	min = min->getLeft();
       }
-      //replace the value
       current->setValue(min->getValue());
-      //delete min
+      
       Delete(current->getRight(), current, min->getValue());
-       }
+      
+    }
   }
 }
 
