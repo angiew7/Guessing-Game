@@ -45,7 +45,7 @@ int main(){
 	    if (isspace(entry[i])||i+1==strlen(entry)){
 	      count = 0;
 	      int num = stoi(nums);
-	      cout << "final "<<num << endl;
+	      
 
 	      nums[0]='\0';
 	      nums[1]='\0';
