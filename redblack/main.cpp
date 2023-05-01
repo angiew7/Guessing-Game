@@ -1,6 +1,11 @@
+/*
+Angie Wang
+5/1/2023
+Using BST insertion, update the tree after each node inserted using Red-Black tree properties
+
+ */
 #include <iostream>
 #include <cstring>
-//#include <time.h>
 #include "Node.h"
 #include <fstream>
 #include<stdio.h>
@@ -14,10 +19,17 @@ void Add(Node* current, int num);
 void Print(Node* current, int depth);
 void Search(Node* current, int num);
 void Delete(Node* current, Node* prev, int num);
+void Update(Node* x);
+void leftRotate(Node* node);
+void rightRotate(Node* node);
+void replaceParentChild(Node* parent, Node* oldChild, Node* newChild);
+
 int main(){
   //  srand(time(NULL));
   char input[20];
   bool playing = true;
+  cout << "NOTE: When printing, p: [number] shows parent of that node, r  means red, b means black. The number following is the int assigned to that node." << endl;
+  cout << endl;
   while(playing == true){
     cout << "[ADD] [SEARCH] [DELETE] [PRINT] [QUIT] ";
     cin >> input;
@@ -28,7 +40,7 @@ int main(){
       cin >> input;
       cin.ignore();
       if(strcmp("MANUAL",input)==0){
-	cout << "Enter a list of numbers seperated by space: " << endl; 
+	cout << "Enter a list of numbers seperated by space: (no more than 100 char inputed total) " << endl; 
 	char entry[100];
 	  cin.get(entry,100,'\n');
 
@@ -47,7 +59,7 @@ int main(){
 	    if (isspace(entry[i])||i+1==strlen(entry)){
 	      count = 0;
 	      int num = stoi(nums);
-	      cout << "final "<<num << endl;
+	      
 
 	      nums[0]='\0';
 	      nums[1]='\0';
@@ -68,7 +80,7 @@ int main(){
 
       }
       if(strcmp(input, "GENERATE")==0){
-	  cout << "How many numbers do you want to generate? ";
+	  cout << "How many numbers do you want to generate? (up to 100) ";
 	  int n = 0;
 	  cin >> n;
 	  cin.ignore();
@@ -135,12 +147,14 @@ void Add(Node* current, int num){
   
   if(num< parent->getValue()){
     parent->setLeft(newNode);
+    newNode->setParent(parent);
   }
   else if(num>= parent->getValue()){
     parent->setRight(newNode);
+    newNode->setParent(parent);
   }
-
-
+  //cout << newNode->getValue() << " parent " << newNode->getParent()->getValue() <<endl;; 
+  Update(newNode);
 
 }
 void Print(Node* current, int depth){
@@ -152,7 +166,15 @@ void Print(Node* current, int depth){
     for(int x = 0; x < depth; x++){
       cout << '\t';
     }
-    cout << current->getValue() << endl;
+    if(current->getParent()!=NULL)
+      cout << "p: " << current->getParent()->getValue() << " ";
+
+    if(current->getColor()==RED)
+      cout << "r";
+    if(current->getColor()==BLACK)
+      cout << "b";
+    cout << current->getValue()<<endl;
+    
     //check left
     if(current->getLeft()!=NULL){
       Print(current->getLeft(), depth+1);
@@ -233,12 +255,123 @@ void Delete(Node* current, Node* prev, int num){
     }
   }
 }
-
-void Update(Node* x, Node* p, Node* u, Node* g){
-  if(p->getColor!=BLACK || x!=head){
-    p->setColor(BLACK);
-    u->setColor(BLACK);
-    g->setColor(RED);
-    Update(g)
+// inspired by algorthim tutor
+void Update(Node* x){
+  Node* p = NULL;
+  Node* u = NULL;
+  Node* g = NULL;
+  //no nodes
+  if(head->getLeft()==NULL&&head->getRight()==NULL){
+    x->setColor(BLACK);
+    head = x;
   }
+
+  while(x!=head && x->getParent()->getColor()==RED){
+    p = x->getParent();
+    g = x->getParent()->getParent();
+         
+    //if parent is  right child
+    if(p == g->getRight()){
+      u = g->getLeft();
+
+     //parent is red and uncle is red ()
+      if(u!=NULL && u->getColor() == RED){
+        u->setColor(BLACK);
+        p->setColor(BLACK);
+        g->setColor(RED);
+        x = g;
+      }   
+      //rotate case
+      else if(u==NULL || u->getColor()==BLACK){
+	//if node is left child then do a right rotation then left
+	if(x == p->getLeft()){
+	  rightRotate(p);
+	  p = x;
+	  
+	}
+	//g = x->getParent()->getParent();
+	leftRotate(g);
+	
+	//recolor original parent and grandparent;
+	x->setColor(RED);
+	p->setColor(BLACK);
+	g->setColor(RED);
+	
+	}
+	
+      }
+    //if parent is left child 
+    else if (p == g->getLeft()){
+	 u = g->getRight();
+	 if(u!=NULL && u->getColor() == RED){
+	   u->setColor(BLACK);
+	   p->setColor(BLACK);
+	   g->setColor(RED);
+	   x = g;
+	 }
+	 //rotate cases
+	 else if(u == NULL || u->getColor() == BLACK){
+	   if(x == p->getRight()){
+	     leftRotate(p);
+	     p = x;
+	   }
+	 
+    	   rightRotate(g);
+	   x->setColor(RED);
+	   p->setColor(BLACK);
+           g->setColor(RED);
+
+	 }
+
+    }
+    //head always black
+    head->setColor(BLACK);
+  }
+}
+
+//used happycoders
+void leftRotate(Node* node){
+  
+  Node* p = node->getParent();
+  Node* x = node->getRight();
+  node->setRight(x->getLeft());
+  if(x->getLeft() !=NULL){
+    x->getLeft()->setParent(node);
+  }
+  
+  x->setLeft(node);
+  
+  node->setParent(x);
+  
+  replaceParentChild(p, node, x);
+}
+void rightRotate(Node* node){
+  
+  Node* p = node->getParent();
+  Node* l = node->getLeft();
+  node->setLeft(l->getRight());
+  if(l->getRight()!=NULL){
+    l->getRight()->setParent(node);
+  }
+  l->setRight(node);
+  node->setParent(l);
+  replaceParentChild(p, node, l);
+}
+void replaceParentChild(Node* parent, Node* oldChild, Node* newChild){
+  if(parent==NULL){
+    head = newChild;
+  }
+  else if(parent->getLeft()==oldChild){
+    parent->setLeft(newChild);
+  }
+  else if(parent->getRight()==oldChild){
+    parent->setRight(newChild);
+  }
+  else{
+    cout << "no" << endl;
+  }
+  if(newChild!= NULL){
+    newChild->setParent(parent);
+  }
+
 }

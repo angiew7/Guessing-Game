@@ -18,10 +18,12 @@ public:
   Node* getLeft(); // Get the left node
   int getColor();
   void setColor(int newColor);
-
+  Node* getParent();
+  void setParent(Node* newParent);
 private:
   Node* right;
   Node* left;
+  Node* parent;
   int value;
   int color;
 };

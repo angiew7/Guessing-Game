@@ -10,6 +10,7 @@ Node::Node(int newValue) {
   right = NULL;
   left = NULL;
   color = 1;
+  parent = NULL;
 }
 Node::~Node(){
   left = NULL;
@@ -42,4 +43,10 @@ int Node::getColor(){
 }
 
 
+void Node::setParent(Node* newParent){
+  parent = newParent;
+}
+Node* Node::getParent(){
+  return parent;
+}
 

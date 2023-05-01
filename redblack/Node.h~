@@ -16,12 +16,13 @@ public:
   Node* getRight(); // Get the right node
   void setLeft(Node* Left); // Set the left node
   Node* getLeft(); // Get the left node
-
+  int getColor();
+  void setColor(int newColor);
 
 private:
   Node* right;
   Node* left;
   int value;
-
+  int color;
 };
 #endif

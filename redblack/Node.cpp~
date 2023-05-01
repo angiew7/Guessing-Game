@@ -9,7 +9,7 @@ Node::Node(int newValue) {
   value = newValue;
   right = NULL;
   left = NULL;
-
+  color = 1;
 }
 Node::~Node(){
   left = NULL;
