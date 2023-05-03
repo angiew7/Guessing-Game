@@ -63,7 +63,7 @@ int main(){
 
 	      nums[0]='\0';
 	      nums[1]='\0';
-	      nums[3]='\0';
+	      nums[2]='\0';
 	      if(head==NULL){
 	       head = new Node(num);
 	       head->setColor(BLACK);
