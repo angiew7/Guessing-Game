@@ -23,6 +23,7 @@ void Update(Node* x);
 void leftRotate(Node* node);
 void rightRotate(Node* node);
 void replaceParentChild(Node* parent, Node* oldChild, Node* newChild);
+void deleteFix(Node* node, Node* p);
 
 int main(){
   //  srand(time(NULL));
@@ -197,6 +198,8 @@ void Search(Node* current, int num){
   
 }
 void Delete(Node* current, Node* prev, int num){
+  Node* child = NULL;
+  int currentColor = BLACK;
   if(num > current->getValue())
     Delete(current->getRight(), current, num);
   else if(num < current->getValue())
@@ -212,7 +215,8 @@ void Delete(Node* current, Node* prev, int num){
 	prev->setLeft(NULL);
       if(prev->getRight()==current)
         prev->setRight(NULL);
-
+      
+      child = NULL;
       current = NULL;
       delete current;
       
@@ -238,6 +242,8 @@ void Delete(Node* current, Node* prev, int num){
       else if(current==prev->getRight()){
 	prev->setRight(temp);
       }
+      child = temp;
+      currentColor = current->getColor();
       current = NULL;
       delete current;
     }
@@ -252,6 +258,10 @@ void Delete(Node* current, Node* prev, int num){
       
       Delete(current->getRight(), current, min->getValue());
       
+    }
+    if(child ==NULL || currentColor == BLACK){
+      cout << "black" << endl;
+      deleteFix(child, prev);
     }
   }
 }
@@ -374,4 +384,74 @@ void replaceParentChild(Node* parent, Node* oldChild, Node* newChild){
     newChild->setParent(parent);
   }
 
+}
+//FIX POTENTIAL SEG FAULTS
+void deleteFix(Node* node, Node* p){
+  Node* s = NULL;
+  
+  //find sibling
+  while(node!=head && node->getColor() == BLACK){ 
+    //left child
+    if(node == p->getLeft()){
+    s = p->getRight();
+    //case 2, red sibling
+    if(s->getColor()==RED){
+      s->setColor(BLACK);
+
+      p->setColor(RED);
+      leftRotate(p);
+      if(p->getRight()!=NULL){
+	s = p->getRight();
+      }
+    }
+    //case 3, black children, black sib, red parent
+    if(s->getLeft()->getColor()==BLACK&&s->getRight()->getColor()==BLACK && node->getParent()->getColor()==RED){
+      s->setColor(RED);
+      node = node->getParent();
+    }//case 4, 
+    else{
+      if(s->getRight()->getColor() == BLACK){
+	s->getLeft()->setColor(BLACK);
+	s->setColor(RED);
+	rightRotate(s);
+	s = node->getParent()->getRight();
+      }//case 3.4
+      s->setColor(p->getColor());
+      p->setColor(BLACK);
+      s->getRight()->setColor(BLACK);
+      leftRotate(node->getParent());
+      node = head;
+    }
+
+  }
+  
+  else if(node == p->getRight()){
+    s = p->getLeft();
+  }
+
+  
+  }
+}
+void fixDelete(Node* node){
+  Node* p = node->getParent();
+  //case 1
+  if(node == head){
+    return;
+  }
+  Node* s = NULL;
+  //get sibling
+  if(node==p->getLeft())
+    s = p->getRight();
+  else if(node==p->getRight())
+    s = p->getLeft();
+  
+  //case 2 red sib
+  if(s->getColor()==RED){
+    sibling->setColor(BLACK);
+    node->getParent()->setColor(RED);
+    if()
+  }
+}
+bool isBlack(Node* node){
+  return node == NULL|| node->getColor() == BLACK;
 }
