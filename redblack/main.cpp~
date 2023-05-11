@@ -23,7 +23,9 @@ void Update(Node* x);
 void leftRotate(Node* node);
 void rightRotate(Node* node);
 void replaceParentChild(Node* parent, Node* oldChild, Node* newChild);
-
+//void deleteFix(Node* node, Node* p);
+void fixDelete(Node* node);
+bool isBlack(Node* node);
 int main(){
   //  srand(time(NULL));
   char input[20];
@@ -209,14 +211,18 @@ void Delete(Node* current, Node* prev, int num){
     
     //if no childrent just delete
     if(current->getLeft()==NULL && current->getRight()==NULL){
-      
+      if(currentColor == BLACK){
+	  cout << "black" << endl;
+	  fixDelete(current);
+	}
+      prev = current->getParent();
       if(prev->getLeft()==current)
-	prev->setLeft(NULL);
+        prev->setLeft(NULL);
       if(prev->getRight()==current)
-        prev->setRight(NULL);https://github.com/angiew7/cpp/tree/main
+        prev->setRight(NULL);
 
-      current = NULL;
-      delete current;
+	current = NULL;
+	delete current;
       
        
     }
@@ -236,30 +242,43 @@ void Delete(Node* current, Node* prev, int num){
       }
       else if(current==prev->getLeft()){
 	prev->setLeft(temp);
+	temp->setParent(prev);
       }
       else if(current==prev->getRight()){
 	prev->setRight(temp);
+	temp->setParent(prev);
       }
       child = temp;
-      currentColor = child->getColor();
+      currentColor = current->getColor();
       current = NULL;
       delete current;
+      if(currentColor == BLACK){
+	cout << "black" << endl;
+	fixDelete(child);
+    }
+
+      //   current = NULL;
+      //delete current;
     }
     //2 children
     else if (current->getRight()!=NULL&&current->getLeft()!=NULL){
       //find leftmost node
       Node* min = current->getRight();
-      while(min && min->getLeft()!=NULL){
+
+      while(min!=NULL && min->getLeft()!=NULL){
 	min = min->getLeft();
       }
+      cout << current->getValue()<<endl;
       current->setValue(min->getValue());
-      
+      cout << current->getValue() << endl;
       Delete(current->getRight(), current, min->getValue());
       
     }
-    if(currentColor == BLACK){
-      deleteFix(child, p);
+    /*   if(child ==NULL || currentColor == BLACK){
+      cout << "black" << endl;
+      fixDelete(child);
     }
+    */
   }
 }
 // inspired by algorthim tutor
@@ -364,6 +383,7 @@ void rightRotate(Node* node){
   node->setParent(l);
   replaceParentChild(p, node, l);
 }
+
 void replaceParentChild(Node* parent, Node* oldChild, Node* newChild){
   if(parent==NULL){
     head = newChild;
@@ -382,46 +402,132 @@ void replaceParentChild(Node* parent, Node* oldChild, Node* newChild){
   }
 
 }
+/*
 //FIX POTENTIAL SEG FAULTS
 void deleteFix(Node* node, Node* p){
   Node* s = NULL;
-  //Node* p = node->getParent();
+  
   //find sibling
-  while(node!=root && node->getColor == BLACK){ 
-  if(node == parent->getLeft()){
-    s = parent->getRight();
+  while(node!=head && node->getColor() == BLACK){ 
+    //left child
+    if(node == p->getLeft()){
+    s = p->getRight();
     //case 2, red sibling
     if(s->getColor()==RED){
       s->setColor(BLACK);
-      parent->setColor(RED);
-      leftParent(parent);
-      s = node->getParent()->getRight();
+
+      p->setColor(RED);
+      leftRotate(p);
+      if(p->getRight()!=NULL){
+	s = p->getRight();
+      }
     }
     //case 3, black children, black sib, red parent
-    if(s->getColor == BLACK && s->getLeft()->getColor()==BLACK&&s->getRight()->getColor()==BLACK && node->getParent()->getColor()==RED){
+    if(s->getLeft()->getColor()==BLACK&&s->getRight()->getColor()==BLACK && node->getParent()->getColor()==RED){
       s->setColor(RED);
-      x = x->getParent();
+      node = node->getParent();
     }//case 4, 
     else{
       if(s->getRight()->getColor() == BLACK){
 	s->getLeft()->setColor(BLACK);
 	s->setColor(RED);
-	rotateRight(s);
-	s = x->getParent()->getRight();
-      }
-      s->setColor(parent->color);
-      parent->setColor(BLACK);
-      s->getRight(BLACK);
-      rotateLeft(x->parent);
-      x = head;
+	rightRotate(s);
+	s = node->getParent()->getRight();
+      }//case 3.4
+      s->setColor(p->getColor());
+      p->setColor(BLACK);
+      s->getRight()->setColor(BLACK);
+      leftRotate(node->getParent());
+      node = head;
     }
 
   }
   
-  else if(node == parent->getRight()){
-    s = parent->getLeft();
+  else if(node == p->getRight()){
+    s = p->getLeft();
   }
 
   
   }
+}
+*/
+//FIX ONE CHILD NODE TO DELETE CASES
+void fixDelete(Node* node){
+  Node* p = node->getParent();
+  
+  //case 1
+  if(node == head){
+    return;
+  }
+  Node* s = NULL;
+  //get sibling
+  if(node==p->getLeft())
+    s = p->getRight();
+  if(node==p->getRight())
+    s = p->getLeft();
+  cout << p->getRight()->getValue()<<endl;
+  //cout << s->getValue()<<endl;
+  //case 2 red sib
+  if(s!=NULL && s->getColor()==RED){
+    cout << "case 2" << endl;
+    //recolor and rotate
+    s->setColor(BLACK);
+    node->getParent()->setColor(RED);
+    if(node == p->getLeft())
+      leftRotate(p);
+    else
+      rightRotate(p);
+    p = node->getParent();
+    //get sibling
+    if(node==p->getLeft())
+      s = p->getRight();
+    else if(node==p->getRight())
+      s = p->getLeft();
+  }
+  //cases 3 4, black sib w/ 2 black children
+  if(s!=NULL&& isBlack(s->getLeft())&&isBlack(s->getRight())){
+    s->setColor(RED);
+    //case 
+    if(p->getColor()==RED){
+      cout << "case 3"<<endl;
+      p->setColor(BLACK);
+    }
+    //case 4 black sib w/ 2 black children + black parent
+  
+    else{
+      cout << "case 4" << endl;
+      fixDelete(node->getParent());
+    }
+  }
+  //case 5, 6 black sib with at least 1 red child
+  else{
+    cout << "case 5 6" << endl;
+    bool isLeftChild = node == node->getParent()->getLeft();
+    if(isLeftChild && isBlack(s->getRight())){
+      s->getLeft()->setColor(BLACK);
+      s->setColor(RED);
+      rightRotate(s);
+      s = node->getParent()->getRight();
+    } else if(!isLeftChild && (s==NULL||isBlack(s->getLeft()))){
+      s->getRight()->setColor(BLACK);
+      s->setColor(RED);
+      rightRotate(s);
+      s = node->getParent()->getLeft();
+      }
+    //recolor sib, parent, child, and rotate around p
+    s->setColor(node->getParent()->getColor());
+    node->getParent()->setColor(BLACK);
+    if(isLeftChild){
+      s->getRight()->setColor(BLACK);
+      leftRotate(node->getParent());
+    }
+    else{
+       s->getLeft()->setColor(BLACK);
+       rightRotate(node->getParent());
+
+    }
+  }
+}
+bool isBlack(Node* node){
+  return node == NULL|| node->getColor() == BLACK;
 }

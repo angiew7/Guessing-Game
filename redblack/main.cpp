@@ -1,7 +1,7 @@
 /*
 Angie Wang
 5/1/2023
-Using BST insertion, update the tree after each node inserted using Red-Black tree properties
+Using BST insertion, update the tree after each node inserted and deleted using Red-Black tree properties
 
  */
 #include <iostream>
@@ -23,8 +23,9 @@ void Update(Node* x);
 void leftRotate(Node* node);
 void rightRotate(Node* node);
 void replaceParentChild(Node* parent, Node* oldChild, Node* newChild);
-void deleteFix(Node* node, Node* p);
-
+//void deleteFix(Node* node, Node* p);
+void fixDelete(Node* node);
+bool isBlack(Node* node);
 int main(){
   //  srand(time(NULL));
   char input[20];
@@ -210,15 +211,18 @@ void Delete(Node* current, Node* prev, int num){
     
     //if no childrent just delete
     if(current->getLeft()==NULL && current->getRight()==NULL){
-      
+      if(current->getColor() == BLACK){
+	  cout << "black" << endl;
+	  fixDelete(current);
+	}
+      prev = current->getParent();
       if(prev->getLeft()==current)
-	prev->setLeft(NULL);
+        prev->setLeft(NULL);
       if(prev->getRight()==current)
         prev->setRight(NULL);
-      
-      child = NULL;
-      current = NULL;
-      delete current;
+
+	current = NULL;
+	delete current;
       
        
     }
@@ -238,34 +242,43 @@ void Delete(Node* current, Node* prev, int num){
       }
       else if(current==prev->getLeft()){
 	prev->setLeft(temp);
+	temp->setParent(prev);
       }
       else if(current==prev->getRight()){
 	prev->setRight(temp);
+	temp->setParent(prev);
       }
       child = temp;
       currentColor = current->getColor();
       current = NULL;
       delete current;
+      if(currentColor == BLACK){
+	cout << "black" << endl;
+	fixDelete(child);
+    }
+
+      //   current = NULL;
+      //delete current;
     }
     //2 children
     else if (current->getRight()!=NULL&&current->getLeft()!=NULL){
+      
       //find leftmost node
       Node* min = current->getRight();
-      while(min && min->getLeft()!=NULL){
+
+      while(min!=NULL && min->getLeft()!=NULL){
 	min = min->getLeft();
       }
+      
       current->setValue(min->getValue());
       
       Delete(current->getRight(), current, min->getValue());
       
     }
-    if(child ==NULL || currentColor == BLACK){
-      cout << "black" << endl;
-      deleteFix(child, prev);
-    }
+    
   }
 }
-// inspired by algorthim tutor
+
 void Update(Node* x){
   Node* p = NULL;
   Node* u = NULL;
@@ -367,6 +380,7 @@ void rightRotate(Node* node){
   node->setParent(l);
   replaceParentChild(p, node, l);
 }
+
 void replaceParentChild(Node* parent, Node* oldChild, Node* newChild){
   if(parent==NULL){
     head = newChild;
@@ -385,55 +399,10 @@ void replaceParentChild(Node* parent, Node* oldChild, Node* newChild){
   }
 
 }
-//FIX POTENTIAL SEG FAULTS
-void deleteFix(Node* node, Node* p){
-  Node* s = NULL;
-  
-  //find sibling
-  while(node!=head && node->getColor() == BLACK){ 
-    //left child
-    if(node == p->getLeft()){
-    s = p->getRight();
-    //case 2, red sibling
-    if(s->getColor()==RED){
-      s->setColor(BLACK);
-
-      p->setColor(RED);
-      leftRotate(p);
-      if(p->getRight()!=NULL){
-	s = p->getRight();
-      }
-    }
-    //case 3, black children, black sib, red parent
-    if(s->getLeft()->getColor()==BLACK&&s->getRight()->getColor()==BLACK && node->getParent()->getColor()==RED){
-      s->setColor(RED);
-      node = node->getParent();
-    }//case 4, 
-    else{
-      if(s->getRight()->getColor() == BLACK){
-	s->getLeft()->setColor(BLACK);
-	s->setColor(RED);
-	rightRotate(s);
-	s = node->getParent()->getRight();
-      }//case 3.4
-      s->setColor(p->getColor());
-      p->setColor(BLACK);
-      s->getRight()->setColor(BLACK);
-      leftRotate(node->getParent());
-      node = head;
-    }
-
-  }
-  
-  else if(node == p->getRight()){
-    s = p->getLeft();
-  }
-
-  
-  }
-}
+//used happy coders
 void fixDelete(Node* node){
   Node* p = node->getParent();
+  
   //case 1
   if(node == head){
     return;
@@ -442,14 +411,71 @@ void fixDelete(Node* node){
   //get sibling
   if(node==p->getLeft())
     s = p->getRight();
-  else if(node==p->getRight())
+  if(node==p->getRight())
     s = p->getLeft();
-  
+  //  cout << p->getRight()->getValue()<<endl;
+
   //case 2 red sib
-  if(s->getColor()==RED){
-    sibling->setColor(BLACK);
+  if(s!=NULL && s->getColor()==RED){
+    cout << "case 2" << endl;
+    //recolor and rotate
+    s->setColor(BLACK);
     node->getParent()->setColor(RED);
-    if()
+    if(node == p->getLeft())
+      leftRotate(p);
+    else
+      rightRotate(p);
+    p = node->getParent();
+    //get sibling
+    if(node==p->getLeft())
+      s = p->getRight();
+    else if(node==p->getRight())
+      s = p->getLeft();
+  }
+  //cases 3 4, black sib w/ 2 black children
+  if(s!=NULL&& isBlack(s->getLeft())&&isBlack(s->getRight())){
+    s->setColor(RED);
+    //case 
+    if(p->getColor()==RED){
+      cout << "case 3"<<endl;
+      p->setColor(BLACK);
+    }
+    //case 4 black sib w/ 2 black children + black parent
+  
+    else{
+      cout << "case 4" << endl;
+      fixDelete(node->getParent());
+    }
+  }
+  //case 5, 6 black sib with at least 1 red child
+  else{
+    cout << "case 5 6" << endl;
+    bool isLeftChild = node == node->getParent()->getLeft();
+    if(isLeftChild && isBlack(s->getRight())){
+      s->getLeft()->setColor(BLACK);
+      s->setColor(RED);
+      rightRotate(s);
+      s = node->getParent()->getRight();
+    } else if(!isLeftChild && (s==NULL||isBlack(s->getLeft()))){
+      if(s->getRight()!=NULL)
+	s->getRight()->setColor(BLACK);
+      s->setColor(RED);
+      rightRotate(s);
+      s = node->getParent()->getLeft();
+      }
+    //recolor sib, parent, child, and rotate around p
+    s->setColor(node->getParent()->getColor());
+    node->getParent()->setColor(BLACK);
+    if(isLeftChild){
+    
+	s->getRight()->setColor(BLACK);
+      leftRotate(node->getParent());
+    }
+    else{
+       s->getLeft()->setColor(BLACK);
+       rightRotate(node->getParent());
+
+    }
   }
 }
 bool isBlack(Node* node){
