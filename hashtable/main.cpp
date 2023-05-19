@@ -1,230 +1,354 @@
+/*
+  This program stores students in a linked table. User can ask to add a student
+  manually or by generating a certain amount randomly.
+  Angie Wang
+  2/17/2023
+ */
 #include <iostream>
 #include <cstring>
-#include <time.h>
-#include "Node.h"
+#include <iomanip>
+#include <ctime>
 #include <fstream>
-#include<stdio.h>
-#include<ctype.h>
-
+#include <time.h>
 using namespace std;
-Node* head = NULL;
-void Add(Node* current, int num);
-void Print(Node* current, int depth);
-void Search(Node* current, int num);
-void Delete(Node* current, Node* prev, int num);
+
+
+
+struct Student{
+  char* firstname = new char[30];
+  char* lastname = new char[30];
+  int id;
+  Student* next = NULL;
+  int hash;
+  float gpa;
+};
+Student** Add(Student* student, Student** table, int size);
+Student* Generate();
+void Print(Student** table, int size);
+Student** Collision(Student** table, int size);
+int Hash(Student* student, int size);
+void Delete(Student** table, int size);
 int main(){
   srand(time(NULL));
-  char input[20];
-  bool playing = true;
-  while(playing == true){
-    cout << "[ADD] [SEARCH] [DELETE] [PRINT] [QUIT] ";
+  bool running = true;
+  int size = 100;
+  Student** table = new Student*[size];
+  
+  while(running == true){
+    //enter command
+    cout << "Enter Command [ADD, PRINT, DELETE, QUIT]: ";
+    char input[10];
     cin >> input;
     cin.ignore();
-    if(strcmp("ADD",input)==0){
 
+    if(strcmp(input, "ADD")==0){
       cout << "[MANUAL] or [GENERATE] entry? ";
       cin >> input;
       cin.ignore();
-      if(strcmp("MANUAL",input)==0){
-	char entry[100];
-	  cin.get(entry,100,'\n');
-	  cout << entry << endl;
-	  cin.ignore();
-	  char num;
-	  char nums[4];
-	  int count = 0;
-	  //while(entry >> num && count != strlen(entry)){
-	  for(int i = 0; i < strlen(entry); i++){
-	    if(!isspace(entry[i])){
-	      
-	      nums[count] = entry[i];
-	      count++;
-	      cout << nums << endl;
-	    }
-	    if (isspace(entry[i])||i+1==strlen(entry)){
-	      count = 0;
-	      int num = stoi(nums);
-	      cout << "final "<<num << endl;
-	      //char* nums = new char[4];
-	      nums[0]='\0';
-	      nums[1]='\0';
-	      nums[3]='\0';
-	      if(head==NULL){
-	       head = new Node(num);
-	       cout << num << endl;
-	      }
-	       else{
-		 Add(head, num);
-	     }
-	      cout << "head" <<head->getValue()<<endl;
-	    }
-	   
-
-	  }
-	
-	//	int num = 0;
-	//cin >> num;
-	//cin.ignore();
-	  /*
-	  if(head==NULL)
-	  head = new Node(num);
-	else{
-	  Add(head, num);
-	}
-	*/
-	cout <<head->getValue()<<endl;
-      }
       if(strcmp(input, "GENERATE")==0){
-	  cout << "How many numbers do you want to generate? ";
-	  int n = 0;
-	  cin >> n;
-	  cin.ignore();
-          for(int i = 0; i < n; i++){
-	  ifstream file("numbers.txt");
-	    int count = 0;
-	    int random = rand()%100;
-	    int num = 0;
-	    char* word = new char();
-	    while(file>>word && count != random){
-	      num = stoi(word);
-	      count++;
-	    }
-	    cout << word <<"num "<< num << endl;
-	    if(head==NULL)
-	      head = new Node(num);
-	    else{
-	      Add(head, num);
-	    }
-	    file.close();
+      cout << "How many students do you want to generate? ";
+      int num = 0;
+      cin >> num;
+      cin.ignore();
+      int i = 0;
+      
+      
+      for(int i = 0; i <num; i++){
+
+	Student* newStu = Generate();
+	
+	
+	  table = Add(newStu, table, size);
+	
+        
+    
+	  cout << endl;
+      
+      
+      int collisions = 1;
+      //check for collisions
+      for(int i = 0 ; i<size && collisions<3; i++){
+	collisions = 0;
+	Student* current = table[i];
+	if(current!=NULL){
+
+	while(current!=NULL){
+	  collisions++;
+	  current = current->next;
+	}
+	}
+	if(collisions > 3){
+
+	  size = size*2;
+	  table = Collision(table, size);
+	}
+	
       }
+      }
+      }
+      //manual add
+      else if(strcmp(input, "MANUAL")==0){
+	Student* student = new Student();
+	cout << "ID: ";
+	cin >> student->id;
+	cin.ignore();
+	cout << "First Name: ";
+	cin >> student->firstname;
+	cin.ignore();
+	cout << "Last Name: ";
+        cin >> student->lastname;
+        cin.ignore();
+	cout << "GPA: ";
+        cin >> student->gpa;
+        cin.ignore();
+
+	table = Add(student, table, size);
+	}
+      }
+      
+
+    if(strcmp(input, "PRINT")==0){
+      Print(table, size);
+    }
+    if(strcmp(input, "DELETE")==0){
+      Delete(table, size);
+    }
+    if(strcmp(input, "QUIT")==0){
+      running = false;
+    }
+    cout << endl;
+  }
+  return 0;
+}
+Student** Add(Student* student, Student** table, int size){
+   student->hash = Hash(student, size);
+  Student* current = table[student->hash];
+	int collisions = 1;
+      	//no collisions
+	if(current == NULL){
+          
+          table[student->hash] = student;
+        }
+	//if something is already there
+	else if(table[student->hash]!=NULL){
+	  
+	  
+          while(current->next!=NULL){
+            current = current->next;
+          
+            collisions++;
+          
+	  }
+	  
+            current->next = student;
+          
+	    /*if(collisions>=3){
+	      size = size*2;
+	      //Student** temp = (Student**)malloc(sizeof(Student*)*size);
+              
+              //temp = table;
+              //table = new Student*[size];
+              //cout << "hi " << size << endl;
+
+              //table = (Student**)malloc(sizeof(Student*)*size);
+	      cout << "collde" << endl;
+	      table = Collision(table, size);
+
+	    }
+	    */
+	    
+
+        }
+
+	
+  
+    return table;
+}
+
+void Print(Student** table, int size){
+  //cout << "hi:";
+  for(int i = 0; i < size; i++){
+    //print head
+    if(table[i]!=NULL){
+      cout << "First Name: " << table[i]->firstname << endl;
+     cout << "Last Name: " << table[i]->lastname << endl;
+     cout << "ID: " << table[i]->id << endl;
+     //only print to 2 decimal places
+     cout << setprecision(2) << fixed;
+     cout << "GPA: " << table[i]->gpa << endl;
+     cout<< endl;
+
+       Student* current = table[i];
+
+
+       //print the linked students
+       while(current->next!=NULL){
+	 
+	 current = current->next;
+	 cout << "next First Name: " << current->firstname << endl;
+	 cout << "Last Name: " << current->lastname << endl;
+	 cout << "ID: " << current->id << endl;
+	 //only print to 2 decimal places
+	 cout << setprecision(2) << fixed;
+	 cout << "GPA: " << current->gpa << endl;
+	 cout<< endl;
+       }
+       
+     
+  }
+  }
+}
+int Hash(Student* student, int size){
+  student->hash = student->id%size;
+ 
+  return student->hash;
+}
+  
+Student* Generate(){
+  
+  Student* student = new Student();
+  int fNameLine = rand()%100;
+  
+  int lineNum = 0;
+  ifstream file("firstName.txt");
+  char line[40];
+  //go thru each line until reaches random generated line number
+  while(fNameLine!=lineNum && file.getline(line, sizeof(line))){
+     
+    ++lineNum;
+  }
+  if(lineNum==fNameLine){
+    
+     
+    strcpy(student->firstname, line);
+  
+    
+  }
+  file.close();
+  cout << student->firstname << endl;
+  
+  //lastname
+  int lNameLine = rand()%100;
+  lineNum =0;
+  ifstream lFile("lastName.txt");
+  char* lLine = new char[40];
+  while(lNameLine!=lineNum && lFile.getline(lLine, sizeof(line))){
+     
+    ++lineNum;
+  }
+  
+  if(lineNum==lNameLine){
+  
+    cout << lLine <<endl;
+    strcpy(student->lastname, lLine);
+
+
+  }
+  lFile.close();
+
+  int studentID = rand()%600000;
+  student->id = studentID;
+  //randomize gpa and id
+  float a = rand()%100;
+  float gpa = float(rand()%5+float(0.01*a));
+  student->gpa = gpa;
+  cout << setprecision(2) << fixed;
+  cout << gpa << endl;
+  cout << student->id << endl;
+  return student;
+}
+Student** Collision(Student** table, int size){
+
+  cout << size;
+
+  Student** oldTable = table;
+  table = new Student*[size];
+  //clear table
+  for(int h=0; h<size; h++){
+    table[h] = NULL;
+  }
+  
+  for(int i = 0; i < size/2; i++){
+    Student* current = oldTable[i];
+    if(current!=NULL){
+    cout << "yass" << oldTable[i]->firstname<< endl;
+
+      Student* current = oldTable[i];
+      
+	while(current!=NULL){
+	  current->hash = Hash(current, size);
+	  Student* temp = new Student();
+	  // copy  student
+	  temp->next = NULL;
+	  temp->firstname = current->firstname;
+	 
+	  temp->lastname = current->lastname;
+	  temp->gpa = current->gpa;
+	  temp->id = current->id;
+	 
+	  table = Add(temp, table, size);
+	  current = current->next;
+	 
+	  }
+      
 	}
     }
-    if(strcmp("PRINT",input)==0){
-      Print(head, 0);
-    }
-    if(strcmp("SEARCH",input)==0){
-      int num = 0;
-      cout << "Number you are looking for: ";
-      cin >> num;
-      cin.ignore();
-      Search(head, num);
-    }
-    if(strcmp("DELETE",input)==0){
-      int num = 0;
-      cout << "Number you want to delete: ";
-      cin >> num;
-      cin.ignore();
-      Delete(head, head, num);
-    }
-    if(strcmp("QUIT",input)==0){
-      playing = false;
-    }
-
-    }
+  delete oldTable;
+  return table;
 }
-void Add(Node* current, int num){
-  Node* parent = NULL;
-  Node* newNode = new Node(num);
-  //Node* current = head;
-  while(current!=NULL){
-    parent=current;
-    if(num < current->getValue()){
-      current  = current->getLeft();
-    }
-    else if(num >=  parent->getValue()){
-      current = current->getRight();
-    }
-  }
-  cout << "parent" << parent->getValue() << endl;
+void Delete(Student** table, int size){
+  int id = 0;
   
-  if(num< parent->getValue()){
-    parent->setLeft(newNode);
-  }
-  else if(num>= parent->getValue()){
-    parent->setRight(newNode);
-  }
-
-
-
-}
-void Print(Node* current, int depth){
-  //right 
-  if(current->getRight()!= NULL){
-    Print(current->getRight(), depth+1);
-  }
-  //print tabs 
-    for(int x = 0; x < depth; x++){
-      cout << '\t';
-    }
-    cout << current->getValue() << endl;
-    //check left
-    if(current->getLeft()!=NULL){
-      Print(current->getLeft(), depth+1);
-    }
+  cout << "Which ID do you want to delete? ";
+  cin >> id;
+  cin.ignore();
+  for(int i = 0; i < size; i++){
     
-}
-//search if the value is found
-void Search(Node* current, int num){
-  if(current->getValue()==num)
-    cout << num << " is found. " << endl;
-  //if reaches leaf and still isnt found, it is not in the tree
-  else if(current->getRight() == NULL && current->getLeft() == NULL){
-    cout << "None found" << endl;
-  }
-  //recursion left and right
-  else if(current->getValue() < num)
-    Search(current->getRight(), num);
-  else if(current->getValue() > num)
-    Search(current->getLeft(), num);
-  
-}
-void Delete(Node* current, Node* prev, int num){
-  if(num > current->getValue())
-    Delete(current->getRight(), current, num);
-  else if(num < current->getValue())
-    Delete(current->getLeft(), current, num);
-  
-  else if(num == current->getValue()){
-    cout << current->getValue()<<endl;
-    //if no childrent just delete
-    if(current->getLeft()==NULL && current->getRight()==NULL){
-      cout << "delete"<<endl;
-      //current = NULL;
-      delete current;
+    if(table[i]!=NULL){
+      Student* temp = table[i];
+      //head
       
-    }
-    //if there is children
-    else if(current->getLeft()==NULL||current->getRight()==NULL){
+      //if theres no chain
+      if (temp->next == NULL){
+	cout << "no chain"<<endl;
+          if(temp->id==id){
+	    table[i]=NULL;
+	    //delete temp;
+	    
+	    
+          }
+        }
+      //if it is the head of chain
+      else if(table[i]->id==id){
+        table[i] = table[i]->next;
+      }
 
-      Node* temp = current;
-      if(current->getLeft()==NULL){
-	temp = current->getRight();
+      else{
+	Student* temp2;
+	cout << "tem " << temp->next->firstname << endl;
+	while(temp->id!=id){
+	
+	  temp2 = temp;
+	  temp = temp->next;
+	}
+	
+	
+	temp2->next = temp->next;
+	
+	
       }
-      else if(current->getRight()==NULL){
-	temp = current->getLeft();
-      }
-    
-      if(current==prev->getLeft()){
-	prev->setLeft(temp);
-      }
-      else if(current==prev->getRight()){
-	prev->setRight(temp);
-      }
-      delete current;
-    }
-    //2 children
-    else if (current->getRight()!=NULL&&current->getLeft()!=NULL){
-      //find leftmost node
-      Node* min = current->getRight();
-      while(min && min->getLeft()!=NULL){
-	min = min->getLeft();
-      }
-      current->setValue(min->getValue());
-      //delete min;
-      //Delete(head, NULL, min->getValue);
-      Delete(min, min, min->getValue());
-      //SOMETIMES SEG FAULTS IF ONLY ONE LEFT
+	  
     }
   }
+	
+	
 }
+    
+      
+
+
+      
+  
+  
+  
 
