@@ -460,7 +460,7 @@ void fixDelete(Node* node){
       if(s->getRight()!=NULL)
 	s->getRight()->setColor(BLACK);
       s->setColor(RED);
-      rightRotate(s);
+      leftRotate(s);
       s = node->getParent()->getLeft();
       }
     //recolor sib, parent, child, and rotate around p
