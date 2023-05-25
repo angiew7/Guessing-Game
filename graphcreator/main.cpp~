@@ -1,0 +1,117 @@
+#include <iostream>
+#include <cstring>
+#include <vector>
+using namespace std;
+
+struct Node{
+  char label;
+  Node* next;
+};
+void addVertex(vector<Node*>&list);
+void addEdge(int table[20][20], vector<Node*>&list);
+void Print(int table[20][20], vector<Node*>&list);
+  
+int main(){
+  //Node* list [21];
+  vector<Node*>list;
+  int table[20][20];
+  bool running = true;
+
+  for(int i = 0; i<20;i++){
+    for(int j = 0; j<20; j++){
+      table[i][j] = 0;
+    }
+  }
+  while(running == true){
+    cout << "Enter a command: [ADD][PRINT][QUIT]" << endl;
+    char input[10];
+    cin >> input;
+    cin.ignore();
+    if(strcmp(input, "ADD")==0){
+      cout << "Add a [VERTEX] or [EDGE]?";
+      cin >> input;
+      cin.ignore();
+      if(strcmp(input, "VERTEX")==0){
+	addVertex(list);
+      }
+      if(strcmp(input, "EDGE")==0){
+	addEdge(table, list);
+      }
+      
+    }
+    if(strcmp(input, "PRINT")==0){
+      Print(table, list);
+    }
+
+    if(strcmp(input, "QUIT")==0){
+      running = false;
+    }
+  }
+  
+  return 0;
+}
+
+void addVertex(vector<Node*>& list){
+  Node* node = new Node();
+  cout << "Enter a single char label:";
+  char newLabel;
+  cin >> newLabel;
+    node->label = newLabel;
+  
+  list.push_back(node);
+}
+void addEdge(int table[20][20], vector<Node*>&list){
+  char label1;
+  cout << "Enter first vertex label: ";
+  cin >> label1;
+  char label2;
+  cout << "Enter second vertex label: ";
+  cin >> label2;
+  int weight = 0;
+  cout << "Enter weight of edge: ";
+  cin >> weight;
+  int x, y;
+  for(int i = 0; i < list.size(); i++){
+    if(list[i]->label == label1){
+      x = i;
+    }
+    if(list[i]->label == label2){
+      y = i;
+    }
+  }
+  table[x][y] = weight;
+  
+}
+
+void Print(int table[20][20], vector<Node*>&list){
+  //print list
+  for(int i = 0; i < list.size(); i++){
+    if(list[i]!=NULL){
+      cout << i << ". " << list[i]->label << endl;
+    }
+  }
+  cout << endl;
+  cout << "*The first column and row is a label"<<endl;
+  //print table
+  //print num across
+  /*
+  for(int t = 0; t <= 20; t++){
+    cout << '\t' << t;
+  }
+  */
+  cout << endl;
+  for(int x = 0; x < list.size(); x++){
+    //cout << x << '\t';
+    for(int y = 0; y<list.size(); y++){
+      //if nothing there
+      if(table[x][y]==0){
+	cout << "0 ";
+      }
+      else{
+	cout << table[x][y]<<' ';
+      }
+    }
+    cout << ' ' << endl;
+  }
+  
+}
