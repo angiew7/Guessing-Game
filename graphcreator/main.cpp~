@@ -1,15 +1,19 @@
 #include <iostream>
 #include <cstring>
 #include <vector>
+#include <limits>
 using namespace std;
 
 struct Node{
   char label;
-  Node* next;
+  int index;
 };
 void addVertex(vector<Node*>&list);
 void addEdge(int table[20][20], vector<Node*>&list);
 void Print(int table[20][20], vector<Node*>&list);
+void removeVertex(int table[20][20], vector<Node*> &list);
+void removeEdge(int table[20][20],  vector<Node*> &list);
+void shortPath(int table[20][20], vector<Node*> &list);
   
 int main(){
   //Node* list [21];
@@ -23,12 +27,12 @@ int main(){
     }
   }
   while(running == true){
-    cout << "Enter a command: [ADD][PRINT][QUIT]" << endl;
+    cout << "Enter a command: [ADD][PRINT][DELETE][QUIT]" << endl;
     char input[10];
     cin >> input;
     cin.ignore();
     if(strcmp(input, "ADD")==0){
-      cout << "Add a [VERTEX] or [EDGE]?";
+      cout << "Add a [VERTEX] or [EDGE]? ";
       cin >> input;
       cin.ignore();
       if(strcmp(input, "VERTEX")==0){
@@ -42,6 +46,21 @@ int main(){
     if(strcmp(input, "PRINT")==0){
       Print(table, list);
     }
+    if(strcmp(input, "DELETE")==0){
+     cout << "Remove a [VERTEX] or [EDGE]? ";
+      cin >> input;
+      cin.ignore();
+      if(strcmp(input, "VERTEX")==0){
+        removeVertex(table, list);
+      }
+      if(strcmp(input, "EDGE")==0){
+        removeEdge(table, list);
+      }
+
+    }
+    if(strcmp(input, "SHORT")==0){
+      shortPath(table, list);
+    }
 
     if(strcmp(input, "QUIT")==0){
       running = false;
@@ -53,12 +72,13 @@ int main(){
 
 void addVertex(vector<Node*>& list){
   Node* node = new Node();
-  cout << "Enter a single char label:";
+  cout << "Enter a single char label: ";
   char newLabel;
   cin >> newLabel;
     node->label = newLabel;
   
   list.push_back(node);
+  node->index = list.size()-1;
 }
 void addEdge(int table[20][20], vector<Node*>&list){
   char label1;
@@ -74,9 +94,11 @@ void addEdge(int table[20][20], vector<Node*>&list){
   for(int i = 0; i < list.size(); i++){
     if(list[i]->label == label1){
       x = i;
+      cout << x << endl;
     }
     if(list[i]->label == label2){
       y = i;
+      cout << y << endl;
     }
   }
   table[x][y] = weight;
@@ -87,22 +109,16 @@ void Print(int table[20][20], vector<Node*>&list){
   //print list
   for(int i = 0; i < list.size(); i++){
     if(list[i]!=NULL){
-      cout << i << ". " << list[i]->label << endl;
+      cout << list[i]->index << ". " << list[i]->label << endl;
     }
   }
   cout << endl;
-  cout << "*The first column and row is a label"<<endl;
-  //print table
-  //print num across
-  /*
-  for(int t = 0; t <= 20; t++){
-    cout << '\t' << t;
-  }
-  */
+  
+  
   cout << endl;
-  for(int x = 0; x < list.size(); x++){
+  for(int x = 0; x < list[list.size()-1]->index+1; x++){
     //cout << x << '\t';
-    for(int y = 0; y<list.size(); y++){
+    for(int y = 0; y < list[list.size()-1]->index+1; y++){
       //if nothing there
       if(table[x][y]==0){
 	cout << "0 ";
@@ -115,3 +131,102 @@ void Print(int table[20][20], vector<Node*>&list){
   }
   
 }
+void removeVertex(int table[20][20], vector<Node*> &list){
+  char input;
+  cout << "Enter the label of the vertex that you want to remove: ";
+  cin >> input;
+  int index = 0;
+  for (int i = 0; i< list.size(); i++){
+    if(list[i]->label == input)
+      index = i;
+  }
+  //erase all edges with that vertex
+  for (int x = 0; x< 20; x++){
+    for (int y = 0; y< 20; y++){
+      if(x == index || y == index){
+	table[x][y] = 0;
+	
+      }
+    }
+  }
+  list.erase(list.begin()+index);
+}
+
+void removeEdge(int table[20][20], vector<Node*> &list){
+  char label1;
+  cout << "Enter first vertex label: ";
+  cin >> label1;
+  char label2;
+  cout << "Enter second vertex label: ";
+  cin >> label2;
+  int x, y;
+  // find vertex index and delete
+  for(int i = 0; i < list.size(); i++){
+    if(list[i]->label == label1){
+      x = i;
+    }
+    if(list[i]->label == label2){
+      y = i;
+    }
+  }
+  table[x][y] = 0;
+
+  
+}
+void shortPath(int table[20][20], vector<Node*> &list){
+  char label1;
+  cout << "Enter first vertex label: ";
+  cin >> label1;
+  char label2;
+  cout << "Enter second vertex label: ";
+  cin >> label2;
+  int x, y;
+  int INF= 10000;
+  int source, end;
+  // find vertex index and 
+  for(int i = 0; i < list.size(); i++){
+    if(list[i]->label == label1){
+      source = i;
+    }
+    if(list[i]->label == label2){
+      end = i;
+    }
+  }   
+    vector<int> path;
+    int dist[20];
+    bool visted[20];
+    //init
+    for(int i =0; i < 20; i++){
+      visted[i] = false;
+      //path[i] = -1;
+      dist[i] = INF;
+    }
+    dist[source] = 0;
+    path.push_back(source);
+    int current;
+    while(current!= -1){
+      current=-1;
+      int closest = INF;
+      for(int i = 0; i<20; i++){
+      
+	if(!visted[i] && dist[i]<closest){
+	  current = i;
+	  closest = dist[i];
+	}
+	visted[current] = true;
+      }
+      for(int j = 0; j < 20; ++j){
+	int neighbor = j;
+	int weight = table[current][j];
+	int newDist = dist[current] + weight;
+	path.push_back(current);
+	if(newDist < dist[neighbor]){
+	  dist[neighbor]=newDist;
+	}
+	
+	}
+    }
+      cout << dist[end]<<endl;
+      
+  
+  }

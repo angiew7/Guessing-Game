@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cstring>
 #include <vector>
+#include <limits>
 using namespace std;
 
 struct Node{
@@ -12,7 +13,8 @@ void addEdge(int table[20][20], vector<Node*>&list);
 void Print(int table[20][20], vector<Node*>&list);
 void removeVertex(int table[20][20], vector<Node*> &list);
 void removeEdge(int table[20][20],  vector<Node*> &list);
-
+void shortPath(int table[20][20], vector<Node*> &list);
+  
 int main(){
   //Node* list [21];
   vector<Node*>list;
@@ -56,6 +58,10 @@ int main(){
       }
 
     }
+    if(strcmp(input, "SHORT")==0){
+      shortPath(table, list);
+    }
+
     if(strcmp(input, "QUIT")==0){
       running = false;
     }
@@ -175,7 +181,8 @@ void shortPath(int table[20][20], vector<Node*> &list){
   cout << "Enter second vertex label: ";
   cin >> label2;
   int x, y;
-
+  int INF= 1000;
+  int source, end;
   // find vertex index and 
   for(int i = 0; i < list.size(); i++){
     if(list[i]->label == label1){
@@ -184,17 +191,46 @@ void shortPath(int table[20][20], vector<Node*> &list){
     if(list[i]->label == label2){
       end = i;
     }
-    int path[20]
+  }
+  cout << "hi" << endl;
+    vector<int> path;
     int dist[20];
     bool visted[20];
     //init
-    for(int i =0; i < 20; i++){
+    for(int i =0; i <20; i++){
       visted[i] = false;
-      path[i] = -1;
-      dist[i] = 1000000000;
+      //path[i] = -1;
+      dist[i] = INF;
     }
+    cout << "init"<<endl;
     dist[source] = 0;
-    path[source] = -1;
-    int current = source;
+    path.push_back(source);
+    int current, closest;
+    //while(true){
+      current=-1;
+      closest = INF;
+      for(int i = 0; i<list.size(); i++){
+	cout << "y" << endl;
+	if(!visted[i] && dist[i]<closest){
+	  current = i;
+	  closest = dist[i];
+	}
+	if(current==1)
+	  break;
+	
+	visted[current] = true;
+	
+	//	}
+    }
+      for(int j = 0; j < list.size(); ++j){
+	
+	if(!visted[j]&&table[current][j]!=INF&&closest+table[current][j]<dist[j]){
+	  dist[j] = closest+table[current][j];
+	}
+      }
     
+      cout << dist[2]<<endl;
+      cout << dist[1] << endl;
+      cout << dist[3] <<endl;
+      cout << "Minimum distance" << dist[end] << endl;
   }
