@@ -193,7 +193,7 @@ void shortPath(int table[20][20], vector<Node*> &list){
     }
   }
   cout << "hi" << endl;
-    vector<int> path;
+  vector<int> path(list.size());
     int dist[20];
     bool visted[20];
     //init
@@ -204,33 +204,59 @@ void shortPath(int table[20][20], vector<Node*> &list){
     }
     cout << "init"<<endl;
     dist[source] = 0;
-    path.push_back(source);
+    path[source]=-1;
     int current, closest;
     //while(true){
+    for(int count = 0; count < list.size()-1; count++){
+
       current=-1;
       closest = INF;
-      for(int i = 0; i<list.size(); i++){
+      for(int i = 0; i<list.size()-1; i++){
 	cout << "y" << endl;
-	if(!visted[i] && dist[i]<closest){
+	if(visted[i]==false && dist[i]<=closest){
 	  current = i;
 	  closest = dist[i];
 	}
-	if(current==1)
-	  break;
+      }
+
 	
-	visted[current] = true;
+	visted[closest] = true;
 	
 	//	}
-    }
-      for(int j = 0; j < list.size(); ++j){
+	int zeros = 0;
+	for(int j = 0; j < list.size(); j++){
+	  
 	
-	if(!visted[j]&&table[current][j]!=INF&&closest+table[current][j]<dist[j]){
-	  dist[j] = closest+table[current][j];
+	  if(!visted[j]&&table[closest][j]!=INF&&dist[closest]!=INF&&dist[closest]+table[closest][j]<dist[j]){
+	    dist[j] = dist[closest]+table[closest][j];
+	    path[j]=j;
+	    cout <<"closest"<< j<< ", " <<current<< endl;
+	  }
+	  else if(table[closest][j]==0){
+	    zeros++;
+	    }
+	  if(zeros == list.size()){
+	    cout << "No path" << endl;
+	  }
 	}
-      }
-    
-      cout << dist[2]<<endl;
-      cout << dist[1] << endl;
-      cout << dist[3] <<endl;
-      cout << "Minimum distance" << dist[end] << endl;
-  }
+       
+	if(count == end-1){
+	  cout << "i " << count << endl;
+	  cout << dist[2]<<endl;
+	  cout << dist[1] << endl;
+	  cout << dist[0] <<endl;
+	  cout << "Minimum distance: " << dist[end] << endl;
+	  cout << "Path: " << endl;
+	  for(int i = 0; i <= list.size(); i++){
+	    cout << path[i] << endl;
+	    if(i!=source){
+	      for(int j = 0; i < list.size(); i++){
+		if(path[i]==list[j]->index){
+		  cout << list[j]->label << endl;
+		}
+	      }  
+	    }
+	  }
+	}
+    }
+}
