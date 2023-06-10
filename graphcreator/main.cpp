@@ -1,3 +1,8 @@
+/*
+  Angie Wang
+  6/9/2023
+  Using an adjancency table and list to represent a graph, the user can add vertices and edges, delete, and find the shortest path between two vertices
+ */
 #include <iostream>
 #include <cstring>
 #include <vector>
@@ -27,7 +32,7 @@ int main(){
     }
   }
   while(running == true){
-    cout << "Enter a command: [ADD][PRINT][DELETE][QUIT]" << endl;
+    cout << "Enter a command: [ADD] [PRINT] [DELETE] [SHORT] [QUIT]" << endl;
     char input[10];
     cin >> input;
     cin.ignore();
@@ -140,7 +145,7 @@ void removeVertex(int table[20][20], vector<Node*> &list){
     if(list[i]->label == input)
       index = i;
   }
-  //erase all edges with that vertex
+  // Erase all edges with that vertex
   for (int x = 0; x< 20; x++){
     for (int y = 0; y< 20; y++){
       if(x == index || y == index){
@@ -173,90 +178,103 @@ void removeEdge(int table[20][20], vector<Node*> &list){
 
   
 }
-void shortPath(int table[20][20], vector<Node*> &list){
+
+void shortPath(int table[20][20], vector<Node*> &list) {
   char label1;
   cout << "Enter first vertex label: ";
   cin >> label1;
   char label2;
   cout << "Enter second vertex label: ";
   cin >> label2;
-  int x, y;
-  int INF= 1000;
-  int source, end;
-  // find vertex index and 
-  for(int i = 0; i < list.size(); i++){
-    if(list[i]->label == label1){
+
+  int source = -1, end = -1;
+
+  // find vertex indices
+  for (int i = 0; i < list.size(); i++) {
+    if (list[i]->label == label1) {
       source = i;
     }
-    if(list[i]->label == label2){
+    if (list[i]->label == label2) {
       end = i;
     }
   }
-  cout << "hi" << endl;
+
+  if (source == -1 || end == -1) {
+    cout << "One or both vertices not found." << endl;
+    return;
+  }
+
+  int INF = 1000;
   vector<int> path(list.size());
-    int dist[20];
-    bool visted[20];
-    //init
-    for(int i =0; i <20; i++){
-      visted[i] = false;
-      //path[i] = -1;
-      dist[i] = INF;
-    }
-    cout << "init"<<endl;
-    dist[source] = 0;
-    path[source]=-1;
-    int current, closest;
-    //while(true){
-    for(int count = 0; count < list.size()-1; count++){
+  int dist[20];
+  bool visited[20];
 
-      current=-1;
-      closest = INF;
-      for(int i = 0; i<list.size()-1; i++){
-	cout << "y" << endl;
-	if(visted[i]==false && dist[i]<=closest){
-	  current = i;
-	  closest = dist[i];
-	}
+  // initialize
+  for (int i = 0; i < 20; i++) {
+    visited[i] = false;
+    dist[i] = INF;
+  }
+
+  dist[source] = 0;
+  path[source] = -1;
+
+  int current, closest;
+  bool pathFound = false;
+
+  for (int count = 0; count < list.size() - 1; count++) {
+    current = -1;
+    closest = INF;
+
+    // Find the closest unvisited vertex
+    for (int i = 0; i < list.size(); i++) {
+      if (!visited[i] && dist[i] <= closest) {
+        current = i;
+        closest = dist[i];
       }
-
-	
-	visted[closest] = true;
-	
-	//	}
-	int zeros = 0;
-	for(int j = 0; j < list.size(); j++){
-	  
-	
-	  if(!visted[j]&&table[closest][j]!=INF&&dist[closest]!=INF&&dist[closest]+table[closest][j]<dist[j]){
-	    dist[j] = dist[closest]+table[closest][j];
-	    path[j]=j;
-	    cout <<"closest"<< j<< ", " <<current<< endl;
-	  }
-	  else if(table[closest][j]==0){
-	    zeros++;
-	    }
-	  if(zeros == list.size()){
-	    cout << "No path" << endl;
-	  }
-	}
-       
-	if(count == end-1){
-	  cout << "i " << count << endl;
-	  cout << dist[2]<<endl;
-	  cout << dist[1] << endl;
-	  cout << dist[0] <<endl;
-	  cout << "Minimum distance: " << dist[end] << endl;
-	  cout << "Path: " << endl;
-	  for(int i = 0; i <= list.size(); i++){
-	    cout << path[i] << endl;
-	    if(i!=source){
-	      for(int j = 0; i < list.size(); i++){
-		if(path[i]==list[j]->index){
-		  cout << list[j]->label << endl;
-		}
-	      }  
-	    }
-	  }
-	}
     }
+
+    visited[current] = true;
+
+    // Update distances
+    for (int j = 0; j < list.size(); j++) {
+      if (!visited[j] && table[current][j] != INF && dist[current] != INF && dist[current] + table[current][j] < dist[j]) {
+        dist[j] = dist[current] + table[current][j];
+        path[j] = current;
+      }
+    }
+    
+    // Mark vertices with weight 0 as visited
+    for (int j = 0; j < list.size(); j++) {
+      if (table[current][j] == 0) {
+        visited[j] = true;
+      }
+    }
+  }
+
+  if (dist[end] == INF||dist[end]==0) {
+    cout << "No path exists between the vertices." << endl;
+    return;
+  }
+
+  // Print the minimum distance and path
+  cout << "Minimum distance: " << dist[end] << endl;
+  cout << "Path: ";
+
+  vector<int> actualPath;
+  int vertex = end;
+
+  while (vertex != -1) {
+    actualPath.push_back(vertex);
+    vertex = path[vertex];
+  }
+
+  for (int i = actualPath.size() - 1; i >= 0; i--) {
+    cout << list[actualPath[i]]->label;
+    if (i != 0) {
+      cout << " -> ";
+    }
+  }
+
+  cout << endl;
 }
+
