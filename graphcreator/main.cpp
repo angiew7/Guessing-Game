@@ -19,7 +19,7 @@ void Print(int table[20][20], vector<Node*>&list);
 void removeVertex(int table[20][20], vector<Node*> &list);
 void removeEdge(int table[20][20],  vector<Node*> &list);
 void shortPath(int table[20][20], vector<Node*> &list);
-int minDistance(int dist[], bool sptSet[]);
+
 
   
 int main(){
@@ -286,16 +286,3 @@ void shortPath(int table[20][20], vector<Node*> &list) {
 }
 
 
-
-int minDistance(int dist[], bool sptSet[])
-{
-  
-    // Initialize min value
-    int min = INT_MAX, min_index;
-  
-    for (int v = 0; v < 20; v++)
-        if (sptSet[v] == false && dist[v] <= min)
-            min = dist[v], min_index = v;
-  
-    return min_index;
-}
