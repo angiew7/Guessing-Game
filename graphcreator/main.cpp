@@ -6,7 +6,7 @@
 #include <iostream>
 #include <cstring>
 #include <vector>
-#include <limits>
+#include <climits>
 using namespace std;
 
 struct Node{
@@ -19,6 +19,8 @@ void Print(int table[20][20], vector<Node*>&list);
 void removeVertex(int table[20][20], vector<Node*> &list);
 void removeEdge(int table[20][20],  vector<Node*> &list);
 void shortPath(int table[20][20], vector<Node*> &list);
+int minDistance(int dist[], bool sptSet[]);
+
   
 int main(){
   //Node* list [21];
@@ -212,7 +214,7 @@ void shortPath(int table[20][20], vector<Node*> &list) {
   // initialize
   for (int i = 0; i < 20; i++) {
     visited[i] = false;
-    dist[i] = INF;
+    dist[i] = INT_MAX;
   }
 
   dist[source] = 0;
@@ -223,7 +225,7 @@ void shortPath(int table[20][20], vector<Node*> &list) {
 
   for (int count = 0; count < list.size() - 1; count++) {
     current = -1;
-    closest = INF;
+    closest = INT_MAX;
 
     // Find the closest unvisited vertex
     for (int i = 0; i < list.size(); i++) {
@@ -232,26 +234,31 @@ void shortPath(int table[20][20], vector<Node*> &list) {
         closest = dist[i];
       }
     }
-
+    
+    //int current = minDistance(dist, visited);
     visited[current] = true;
-
+    
     // Update distances
     for (int j = 0; j < list.size(); j++) {
-      if (!visited[j] && table[current][j] != INF && dist[current] != INF && dist[current] + table[current][j] < dist[j]) {
-        dist[j] = dist[current] + table[current][j];
+      if (!visited[j] && table[current][j] != INT_MAX &&table[current][j]!=0&& dist[current] != INT_MAX && dist[current] + table[current][j] < dist[j]) {
+	cout << "visited " << dist[current] <<endl;
+	dist[j] = dist[current] + table[current][j];
         path[j] = current;
       }
     }
-    
+    /*        
     // Mark vertices with weight 0 as visited
     for (int j = 0; j < list.size(); j++) {
       if (table[current][j] == 0) {
         visited[j] = true;
       }
     }
-  }
+    cout<< dist[end]<<endl;
+    cout << dist[end-1]<<endl;
+    */  
+}
 
-  if (dist[end] == INF||dist[end]==0) {
+  if (dist[end] == INT_MAX||dist[end]==0) {
     cout << "No path exists between the vertices." << endl;
     return;
   }
@@ -278,3 +285,17 @@ void shortPath(int table[20][20], vector<Node*> &list) {
   cout << endl;
 }
 
+
+
+int minDistance(int dist[], bool sptSet[])
+{
+  
+    // Initialize min value
+    int min = INT_MAX, min_index;
+  
+    for (int v = 0; v < 20; v++)
+        if (sptSet[v] == false && dist[v] <= min)
+            min = dist[v], min_index = v;
+  
+    return min_index;
+}
