@@ -64,7 +64,7 @@ int main(){
     
 	  cout << endl;
       
-      
+	  /*
       int collisions = 1;
       //check for collisions
       for(int i = 0 ; i<size && collisions<3; i++){
@@ -84,6 +84,9 @@ int main(){
 	}
 	
       }
+      }
+	  */
+	  
       }
       }
       //manual add
@@ -140,9 +143,9 @@ Student** Add(Student* student, Student** table, int size){
           
 	  }
 	  
-            current->next = student;
-          
-	    /*if(collisions>=3){
+	  current->next = student;
+
+	    if(collisions>=3){
 	      size = size*2;
 	      //Student** temp = (Student**)malloc(sizeof(Student*)*size);
               
@@ -155,7 +158,7 @@ Student** Add(Student* student, Student** table, int size){
 	      table = Collision(table, size);
 
 	    }
-	    */
+	    
 	    
 
         }
